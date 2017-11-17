@@ -2,25 +2,45 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "names-function": {
+    "environment-name": {
        "type": "string",
+       "defaultValue": "dev",
        "metadata": {
-            "description": "The name of the function app "
+            "description": ""
+        }
+    },
+    "names-function-storage": {
+       "type": "string",
+       "defaultValue": "functions01",
+       "metadata": {
+            "description": "The name of the storage account to be used by the azure functions. Will be prepended with the name of the environment"
+        }
+    },
+    "names-function-apps": {
+       "type": "array",
+       "metadata": {
+            "description": "The names of the dynamic function apps to deploy "
+        }
+    },
+    "names-function-sp": {
+       "type": "string",
+       "defaultValue": "dynamic",
+       "metadata": {
+            "description": "The name to use for the app service plan. Will be appended with environment prefix and -sp suffix"
         }
     },
     "names-webapp": {
        "type": "string",
        "metadata": {
-            "description": "The name of the sample web app to use"
+            "description": "The name of the sample web app to use. To ensure that it can be deployed in the same resource group as the functions"
         }
     }
   },
   "variables": {
-    "names-function-name": "[concat(parameters('names-function'), '-fn')]",
-    "names-function-sp": "[concat(parameters('names-function'), '-sp')]",
-    "names-function-storage": "[replace(parameters('names-function'),'-', '')]",
-    "names-webapp": "[parameters('names-webapp')]",
-    "names-webapp-sp": "[variables('names-webapp')]"
+    "names-function-sp": "[concat(parameters('environment-name'), '-', parameters('names-function-sp'), '-sp')]",
+    "names-function-storage": "[concat(replace(parameters('environment-name'), '-', ''), parameters('names-function-storage'))]",
+    "names-webapp": "[concat(parameters('environment-name'), '-', parameters('names-webapp'))]",
+    "names-webapp-sp": "[concat(variables('names-webapp'), '-sp')]"
   },
   "resources": [
     {
@@ -36,19 +56,23 @@
       },
     {
         "apiVersion": "2015-08-01",
-        "name": "[variables('names-function-name')]",
+        "name": "[concat(parameters('environment-name'), '-', parameters('names-function-apps')[copyIndex()], '-fn')]",
+        "copy": { 
+            "name": "functionappscopy", 
+            "count": "[length(parameters('names-function-apps'))]" 
+         }, 
         "type": "Microsoft.Web/sites",
         "kind": "functionapp", 
         "location": "[resourceGroup().location]",
         "tags": {
             "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', variables('names-function-sp'))]": "Resource",
-            "displayName": "[variables('names-function-name')]"
+            "displayName": "[concat(parameters('environment-name'), '-', parameters('names-function-apps')[copyIndex()], '-fn')]"
         },
         "dependsOn": [
             "[concat('Microsoft.Web/serverfarms/', variables('names-function-sp'))]"
         ],
         "properties": {
-            "name": "[variables('names-function-name')]",
+            "name": "[concat(parameters('environment-name'), '-', parameters('names-function-apps')[copyIndex()], '-fn')]",
             "serverFarmId": "[resourceId('Microsoft.Web/serverfarms/', variables('names-function-sp'))]"
         }
     },
@@ -103,11 +127,5 @@
             "serverFarmId": "[resourceId('Microsoft.Web/serverfarms/', variables('names-webapp-sp'))]"
         }
     }
-  ],
-  "outputs": {
-      "output-function-name": {
-          "type": "string",
-          "value": "[variables('names-function-name')]"
-      }
-  }
+  ]
 }
