@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.27004.2008
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherFunction", "WeatherFunction\WeatherFunction.csproj", "{A727B90D-1843-4AE0-B693-82B01632ABB5}"
 EndProject
+Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "Azure.Templates", "Azure.Templates\Azure.Templates.deployproj", "{EC820100-4D79-473E-BA82-4CF43356A456}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{A727B90D-1843-4AE0-B693-82B01632ABB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A727B90D-1843-4AE0-B693-82B01632ABB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A727B90D-1843-4AE0-B693-82B01632ABB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC820100-4D79-473E-BA82-4CF43356A456}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC820100-4D79-473E-BA82-4CF43356A456}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC820100-4D79-473E-BA82-4CF43356A456}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC820100-4D79-473E-BA82-4CF43356A456}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

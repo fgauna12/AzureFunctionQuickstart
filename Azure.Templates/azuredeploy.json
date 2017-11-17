@@ -1,0 +1,108 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "names-function": {
+       "type": "string",
+       "metadata": {
+            "description": "The name of the function app"
+        }
+    },
+    "names-samplewebapp": {
+       "type": "string",
+       "metadata": {
+            "description": "The name of the sample web app to use"
+        }
+    }
+  },
+  "variables": {
+    "names-function-name": "[concat(parameters('names-function'), '-fn')]",
+    "names-function-sp": "[concat(parameters('names-function'), '-sp')]",
+    "names-function-storage": "[replace(parameters('names-function'),'-', '')]",
+    "names-webapp": "[parameters('names-samplewebapp')]",
+    "names-webapp-sp": "[variables('names-webapp')]"
+  },
+  "resources": [
+    {
+        "type": "Microsoft.Storage/storageAccounts",
+        "name": "[variables('names-function-storage')]",
+        "apiVersion": "2016-01-01",
+        "location": "[resourceGroup().location]",
+        "sku": {
+          "name": "Standard_LRS"
+        },
+        "kind": "Storage",
+        "properties": {}
+      },
+    {
+        "apiVersion": "2015-08-01",
+        "name": "[variables('names-function-name')]",
+        "type": "Microsoft.Web/sites",
+        "kind": "functionapp", 
+        "location": "[resourceGroup().location]",
+        "tags": {
+            "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', variables('names-function-sp'))]": "Resource",
+            "displayName": "[variables('names-function-name')]"
+        },
+        "dependsOn": [
+            "[concat('Microsoft.Web/serverfarms/', variables('names-function-sp'))]"
+        ],
+        "properties": {
+            "name": "[variables('names-function-name')]",
+            "serverFarmId": "[resourceId('Microsoft.Web/serverfarms/', variables('names-function-sp'))]"
+        }
+    },
+    {
+        "apiVersion": "2014-06-01",
+        "name": "[variables('names-function-sp')]",
+        "type": "Microsoft.Web/serverfarms",
+        "location": "[resourceGroup().location]",
+        "tags": {
+            "displayName": "[variables('names-function-sp')]"
+        },
+        "properties": {
+            "name": "[variables('names-function-sp')]",
+            "computeMode": "Dynamic",
+            "sku": "Dynamic"
+        }
+    },
+    {
+        "comments": "Have the app service depend on the function app so the function is the first one on the resource group",
+        "apiVersion": "2014-06-01",
+        "name": "[variables('names-webapp-sp')]",
+        "type": "Microsoft.Web/serverfarms",
+        "location": "[resourceGroup().location]",
+        "sku": {
+            "name": "S1",
+            "capacity": 1
+        },
+        "dependsOn": [
+            "[concat('Microsoft.Web/serverfarms/', variables('names-function-sp'))]"
+        ],
+        "tags": {
+            "displayName": "[variables('names-webapp-sp')]"
+        },
+        "properties": {
+            "name": "[variables('names-webapp-sp')]"
+        }
+    },
+    {
+        "apiVersion": "2015-08-01",
+        "name": "[variables('names-webapp')]",
+        "type": "Microsoft.Web/sites",
+        "location": "[resourceGroup().location]",
+        "tags": {
+            "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', variables('names-webapp-sp'))]": "Resource",
+            "displayName": "[variables('names-webapp')]"
+        },
+        "dependsOn": [
+            "[concat('Microsoft.Web/serverfarms/', variables('names-webapp-sp'))]"
+        ],
+        "properties": {
+            "name": "[variables('names-webapp')]",
+            "serverFarmId": "[resourceId('Microsoft.Web/serverfarms/', variables('names-webapp-sp'))]"
+        }
+    }
+  ],
+  "outputs": {}
+}
