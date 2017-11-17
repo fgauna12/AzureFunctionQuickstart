@@ -104,5 +104,10 @@
         }
     }
   ],
-  "outputs": {}
+  "outputs": {
+      "output-function-name": {
+          "type": "string",
+          "value": "[variables('names-function-name')]"
+      }
+  }
 }
