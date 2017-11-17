@@ -5,7 +5,7 @@
     "names-function": {
        "type": "string",
        "metadata": {
-            "description": "The name of the function app"
+            "description": "The name of the function app "
         }
     },
     "names-webapp": {
